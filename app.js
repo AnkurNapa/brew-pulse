@@ -1,7 +1,7 @@
 // Brew Pulse: one page app over data.json. Hash routes: #/today, #/browse/<kind>, #/item/<kind>/<n>, #/origins, #/search, #/about.
 const KINDS = { styles: 'Styles', hops: 'Hops', yeasts: 'Yeasts', fermentables: 'Malts' };
-const TABS = [['today', 'Today'], ['browse', 'Browse'], ['origins', 'Origins'], ['search', 'Search'], ['about', 'About']];
-const ICON_FOR = { today: 'today', browse: 'browse', origins: 'map', search: 'search', about: 'about' };
+const TABS = [['today', 'Today'], ['browse', 'Browse'], ['build', 'Build'], ['origins', 'Origins'], ['about', 'About']];
+const ICON_FOR = { today: 'today', browse: 'browse', build: 'build', origins: 'map', search: 'search', about: 'about' };
 const SRC = 'https://www.beer-analytics.com';
 // Rough growing region per origin country, for the map (longitude, latitude).
 const PLACES = {
@@ -101,6 +101,7 @@ function browse(kind = 'hops', limit = 50) {
   const total = list.reduce((s, e) => s + e.count, 0);
   const seg = Object.entries(KINDS).map(([k, t]) => `<a href="#/browse/${k}" ${k === kind ? 'aria-current="page"' : ''}>${t}</a>`).join('');
   return `<p class="eyebrow">${num(list.length)} ${KINDS[kind].toLowerCase()} · all time</p><h1 class="lt">Browse</h1>
+    <a class="search search-link" href="#/search">${ico('search')}Search styles, hops, yeasts and malts</a>
     <div class="seg" role="tablist">${seg}</div>
     <div class="sec"><h2>By number of recipes</h2></div>
     <div class="colh"><span>#</span><span>Name</span><span>Recipes</span><span>Share</span><span></span></div>
@@ -216,7 +217,7 @@ function about() {
       <p>Every number here comes from <a href="${SRC}" rel="noopener">Beer Analytics</a>, created by homebrewer and software engineer Christian Scheb. He gathers brewing recipes from homebrewing communities online and analyses what goes into them. The analysis is his work. Please visit his site, star the <a href="https://github.com/scheb/beer-analytics" rel="noopener">project on GitHub</a> or buy him a beer through the link on his about page.</p>
       <p>His content is licensed <a href="https://creativecommons.org/licenses/by-sa/4.0/" rel="noopener">CC BY-SA 4.0</a>. Brew Pulse adapts it under the same licence. Recipes belong to their authors, so only their titles and links appear here. Each one opens on its original site. Every item also links back to its page on Beer Analytics.</p></section>
     <section class="card prose"><h2>What Brew Pulse adds</h2>
-      <p>A phone first view for people working in craft breweries who want this month's picture in a minute. It adds a monthly headline with movers worked out from the data, one place to browse every style, hop, yeast or malt by recipe count, community recipe links for each item, a map of where the most used hops are grown, plus search. Data was refreshed on ${esc(D.updated)}.</p></section>
+      <p>A phone first view for people working in craft breweries who want this month's picture in a minute. It adds a monthly headline with movers worked out from the data, one place to browse every style, hop, yeast or malt by recipe count, community recipe links for each item, a recipe builder that checks your beer against what brewers really brew for the style, a map of where the most used hops are grown, plus search. Data was refreshed on ${esc(D.updated)}.</p></section>
     <section class="card prose"><h2>Made by Ankur Napa</h2>
       <p>Ankur builds data and AI tools for brewers and distillers. Other things he has built for beer and AI:</p>
       <div class="work">${work}</div>
@@ -243,12 +244,13 @@ function chrome(route) {
 }
 function render() {
   const [route = 'today', a, b] = location.hash.replace(/^#\/?/, '').split('/');
-  const views = { today, browse: () => browse(a), item: () => item(a, b), origins, search: () => search(decodeURIComponent(a || '')), about };
+  const views = { today, browse: () => browse(a), item: () => item(a, b), build: () => build(a), origins, search: () => search(decodeURIComponent(a || '')), about };
   const view = views[route] || today;
-  chrome(route === 'item' ? 'browse' : views[route] ? route : 'today');
+  chrome(['item', 'search'].includes(route) ? 'browse' : views[route] ? route : 'today');
   $('#view').innerHTML = view();
   window.scrollTo(0, 0);
   if (route === 'origins') initMap();
+  if (route === 'build') initBuilder();
   document.querySelectorAll('[data-recipes]').forEach(fillRecipes);
   const q = $('#q');
   if (q) { q.focus(); q.addEventListener('input', () => { $('#results').innerHTML = results(q.value); }); }

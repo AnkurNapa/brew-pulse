@@ -16,6 +16,7 @@ Beer Analytics content is licensed [CC BY-SA 4.0](https://creativecommons.org/li
 - Browse every style, hop, yeast or malt by recipe count
 - Hop origins by country, weighted by recipe count
 - Community recipe links for each item, opening the original recipe
+- A recipe builder: OG, FG, ABV, IBU and colour, checked against what brewers really brew for the chosen style
 - Search across all four lists
 - A phone first layout in the Apple system style, with dark mode
 

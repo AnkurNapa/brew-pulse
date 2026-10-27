@@ -159,3 +159,52 @@ footer { max-width: 1080px; margin: 0 auto; padding: 0 20px 40px; font-size: 12p
 /* recipe links: name with author and source, opens the original */
 .row.rec { grid-template-columns: 1fr 20px; }
 .rec-out { width: 16px; height: 16px; color: var(--muted); }
+
+/* recipe builder */
+.search-link { display: flex; align-items: center; gap: 8px; color: var(--muted); font-size: 15px; }
+.bgrid { display: grid; grid-template-columns: 1fr 340px; gap: 16px; margin-top: 16px; align-items: start; }
+.bgrid > * { min-width: 0; }
+.bside { position: sticky; top: 76px; display: grid; gap: 16px; }
+.bcard { padding: 14px; }
+.bcard + .bcard { margin-top: 16px; }
+.bside .bcard + .bcard { margin-top: 0; }
+.bhead { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+.bhead h3 { font-size: 17px; flex: 1; }
+.brow { display: grid; grid-template-columns: minmax(0, 1fr) 64px 76px 64px 28px; gap: 8px; align-items: end; padding: 10px 0; border-top: 1px solid var(--line); }
+.bhead + .brow { border-top: 0; }
+.bhops .brow { grid-template-columns: minmax(0, 1fr) 56px 64px 52px 92px 28px; }
+.brow.b4 { grid-template-columns: minmax(0, 1fr) 72px 92px 72px; }
+.brow label { display: grid; gap: 4px; font-size: 11px; color: var(--muted); }
+.brow .wide { grid-column: 1 / -1; }
+.brow.b4 .wide { grid-column: auto; }
+.bmain { display: grid; gap: 4px; }
+.bmain small { font-size: 12px; color: var(--muted); }
+.bf { width: 100%; min-height: 36px; padding: 6px 10px; border: 0; border-radius: 8px; background: var(--fill); color: var(--text); font: inherit; font-size: 15px; }
+.bf::placeholder { color: var(--muted); }
+.bx { min-height: 36px; border: 0; border-radius: 8px; background: none; color: var(--muted); font-size: 20px; cursor: pointer; }
+.bx:hover { background: var(--fill2); color: var(--red); }
+.badd, .btn2 { border: 0; border-radius: 8px; padding: 8px 14px; background: var(--blue); color: #fff; font: inherit; font-size: 14px; font-weight: 600; cursor: pointer; }
+.btn2.ghost { background: var(--fill); color: var(--text); }
+.bact { display: flex; flex-wrap: wrap; gap: 8px; }
+.linkb { border: 0; background: none; color: var(--blue); font: inherit; padding: 0; cursor: pointer; }
+.glass { width: 26px; height: 32px; border-radius: 3px 3px 8px 8px; box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .12); flex: none; }
+.bm { display: grid; grid-template-columns: 1fr auto; gap: 2px 12px; padding: 10px 0; border-top: 1px solid var(--line); }
+.bm > span { font-size: 15px; }
+.bm b { font-size: 20px; color: var(--ink); text-align: right; }
+.bm small { grid-column: 1 / -1; font-size: 12px; color: var(--muted); }
+.bbar { grid-column: 1 / -1; position: relative; height: 8px; margin-top: 4px; border-radius: 4px; background: var(--fill); }
+.bband { position: absolute; top: 0; bottom: 0; border-radius: 4px; background: var(--green-t); box-shadow: inset 0 0 0 1px var(--green); }
+.bdot { position: absolute; top: -3px; width: 14px; height: 14px; margin-left: -7px; border-radius: 50%; border: 2px solid var(--card); }
+.bdot.in { background: var(--green); } .bdot.out { background: var(--red); }
+@media (max-width: 900px) {
+  .bgrid { grid-template-columns: 1fr; }
+  .bside { position: static; order: -1; }
+}
+@media (max-width: 760px) {
+  .brow, .bhops .brow { grid-template-columns: 1fr 1fr 1fr; }
+  .brow .bmain { grid-column: 1 / -1; }
+  .bhops .brow label:nth-of-type(4) { grid-column: span 2; }
+  .brow.b4 { grid-template-columns: 1fr 1fr 1fr; }
+  .brow.b4 .wide { grid-column: 1 / -1; }
+  .bx { grid-column: 3; justify-self: end; }
+}
