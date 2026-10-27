@@ -155,3 +155,7 @@ footer { max-width: 1080px; margin: 0 auto; padding: 0 20px 40px; font-size: 12p
 #osm { height: 380px; background: var(--fill2); z-index: 0; }
 .osmcard + .prose { padding-top: 8px; padding-bottom: 8px; }
 @media (max-width: 760px) { #osm { height: 300px; } }
+
+/* recipe links: name with author and source, opens the original */
+.row.rec { grid-template-columns: 1fr 20px; }
+.rec-out { width: 16px; height: 16px; color: var(--muted); }

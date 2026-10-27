@@ -79,10 +79,20 @@ function today() {
       ${focus ? `<div><div class="chart-head"><span>${esc(shortName(focus.name))}<small>share of recipes</small></span><span class="${tone(focus.pct)}">${pct(focus.pct)}<small>on last year</small></span></div>${spark(focus.values)}<div class="axis"><span>${esc(D.months[0])}</span><span>${esc(D.months[D.months.length - 1])}</span></div></div>` : ''}</section>
     <div class="sec"><h2>Movers</h2><span class="eyebrow">change on last year</span></div>
     <div class="movers">${[...risers, ...fallers].map(tile).join('')}</div>
+    ${recipeTeaser(rows)}
     <div class="sec"><h2>Most used</h2><span class="eyebrow">share of recipes · points on last year</span></div>
     <div class="cols">${col('styles')}${col('hops')}${col('yeasts')}</div>
     <div class="sec"><h2>Where the hops grow</h2><a href="#/origins">See map</a></div>
     ${originsCard(4)}`;
+}
+
+// Five recipes for the fastest rising style that has recipe links, else the most used one that does.
+function recipeTeaser(rows) {
+  const pick = [...rows].filter((r) => r.kind === 'styles' && r.entry?.r).sort((a, b) => b.pct - a.pct)[0]
+    || D.trends.styles.popular.map((r) => findEntry('styles', r.name)).filter((e) => e?.r).map((entry) => ({ entry, name: entry.name }))[0];
+  if (!pick) return '';
+  return `<div class="sec"><h2>Recipes to try: ${esc(pick.name)}</h2><a href="#/item/styles/${pick.entry.i}">See all</a></div>
+    <section class="card list" data-recipes="styles/${pick.entry.i}" data-limit="5"><p class="note" style="padding:14px">Loading recipes…</p></section>`;
 }
 
 function browse(kind = 'hops', limit = 50) {
@@ -116,7 +126,10 @@ function item(kind, i) {
       <div class="card fact"><b>#${rank}</b><span>of ${num(D.lists[kind].length)} ${KINDS[kind].toLowerCase()}</span></div>
       ${e.origin ? `<div class="card fact"><b>${esc(e.origin)}</b><span>origin</span></div>` : now != null ? `<div class="card fact"><b>${share(now)}</b><span>of recipes this month</span></div>` : ''}</div>
     ${t ? `<section class="card detail"><div class="chart-head"><span>Share of recipes<small>last three years</small></span><span class="${tone(t.pct)}">${pct(t.pct)}<small>on last year</small></span></div>${spark(t.values, 600, 160)}<div class="axis"><span>${esc(D.months[0])}</span><span>${esc(D.months[D.months.length - 1])}</span></div></section>` : ''}
-    <section class="card prose"><p>Dosage, pairings, typical styles and sample recipes for ${esc(e.name)} are on its full Beer Analytics page.</p>
+    <div class="sec"><h2>Recipes</h2><span class="eyebrow">${e.r ? `${e.r} from the community` : ''}</span></div>
+    <section class="card list" data-recipes="${kind}/${+i}">${e.r ? '<p class="note" style="padding:14px">Loading recipes…</p>' : `<p class="note" style="padding:14px">Recipe links for ${esc(e.name)} arrive with the next data refresh. Its Beer Analytics page has some now.</p>`}</section>
+    <p class="note">Recipes belong to their authors. Each link opens the original recipe on its own site.</p>
+    <section class="card prose" style="margin-top:16px"><p>Dosage, pairings and typical styles for ${esc(e.name)} are on its full Beer Analytics page.</p>
       <a class="btn" href="${SRC}${esc(e.url)}" rel="noopener">${ico('out')}Full analysis on Beer Analytics</a></section>`;
 }
 
@@ -201,13 +214,25 @@ function about() {
   return `<p class="eyebrow">Credits</p><h1 class="lt">About</h1>
     <section class="card prose"><h2>Built on Beer Analytics</h2>
       <p>Every number here comes from <a href="${SRC}" rel="noopener">Beer Analytics</a>, created by homebrewer and software engineer Christian Scheb. He gathers brewing recipes from homebrewing communities online and analyses what goes into them. The analysis is his work. Please visit his site, star the <a href="https://github.com/scheb/beer-analytics" rel="noopener">project on GitHub</a> or buy him a beer through the link on his about page.</p>
-      <p>His content is licensed <a href="https://creativecommons.org/licenses/by-sa/4.0/" rel="noopener">CC BY-SA 4.0</a>. Brew Pulse adapts it under the same licence. Recipes belong to their authors, so none are copied here: every item links back to its page on Beer Analytics.</p></section>
+      <p>His content is licensed <a href="https://creativecommons.org/licenses/by-sa/4.0/" rel="noopener">CC BY-SA 4.0</a>. Brew Pulse adapts it under the same licence. Recipes belong to their authors, so only their titles and links appear here. Each one opens on its original site. Every item also links back to its page on Beer Analytics.</p></section>
     <section class="card prose"><h2>What Brew Pulse adds</h2>
-      <p>A phone first view for people working in craft breweries who want this month's picture in a minute. It adds a monthly headline with movers worked out from the data, one place to browse every style, hop, yeast or malt by recipe count, a map of where the most used hops are grown, plus search. Data was refreshed on ${esc(D.updated)}.</p></section>
+      <p>A phone first view for people working in craft breweries who want this month's picture in a minute. It adds a monthly headline with movers worked out from the data, one place to browse every style, hop, yeast or malt by recipe count, community recipe links for each item, a map of where the most used hops are grown, plus search. Data was refreshed on ${esc(D.updated)}.</p></section>
     <section class="card prose"><h2>Made by Ankur Napa</h2>
       <p>Ankur builds data and AI tools for brewers and distillers. Other things he has built for beer and AI:</p>
       <div class="work">${work}</div>
       <p style="margin-top:14px">More on <a href="https://github.com/AnkurNapa" rel="noopener">GitHub</a>.</p></section>`;
+}
+
+// Recipe links live in one small file per item, fetched only when that item is on screen.
+function fillRecipes(box) {
+  const [kind, i] = box.dataset.recipes.split('/');
+  if (!D.lists[kind]?.[i]?.r) return;
+  const limit = +(box.dataset.limit || 0) || Infinity;
+  fetch(`r/${kind}/${i}.json`).then((r) => { if (!r.ok) throw new Error(r.status); return r.json(); })
+    .then((recs) => {
+      box.innerHTML = recs.slice(0, limit).filter((x) => /^https?:\/\//.test(x.u)).map((x) => `<a class="row rec" href="${esc(x.u)}" target="_blank" rel="noopener nofollow"><span class="n">${esc(x.t)}<small>${[x.a && `by ${esc(x.a)}`, esc(x.s)].filter(Boolean).join(' · ')}</small></span>${ico('out', 'ico rec-out')}</a>`).join('');
+    })
+    .catch(() => { box.innerHTML = '<p class="note" style="padding:14px">Recipes could not load. Refresh to try again.</p>'; });
 }
 
 // ---------- shell ----------
@@ -224,6 +249,7 @@ function render() {
   $('#view').innerHTML = view();
   window.scrollTo(0, 0);
   if (route === 'origins') initMap();
+  document.querySelectorAll('[data-recipes]').forEach(fillRecipes);
   const q = $('#q');
   if (q) { q.focus(); q.addEventListener('input', () => { $('#results').innerHTML = results(q.value); }); }
 }

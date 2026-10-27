@@ -8,13 +8,14 @@ What brewers are brewing this month, on your phone. Rising and falling styles, h
 
 Every number comes from [Beer Analytics](https://www.beer-analytics.com), created by Christian Scheb. He gathers brewing recipes from homebrewing communities online and analyses what goes into them. The analysis is his. If you find this useful, visit his site or star [his project](https://github.com/scheb/beer-analytics).
 
-Beer Analytics content is licensed [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/). The data in `data.json` is an adaptation of it, shared under the same licence. No recipes are copied: they belong to their authors, so every item links back to its Beer Analytics page.
+Beer Analytics content is licensed [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/). The data in `data.json` is an adaptation of it, shared under the same licence. Recipes belong to their authors, so only titles with links to the original recipe pages are listed. Every item also links back to its Beer Analytics page.
 
 ## What this adds
 
 - A monthly headline plus movers, worked out from the trend data
 - Browse every style, hop, yeast or malt by recipe count
 - Hop origins by country, weighted by recipe count
+- Community recipe links for each item, opening the original recipe
 - Search across all four lists
 - A phone first layout in the Apple system style, with dark mode
 
