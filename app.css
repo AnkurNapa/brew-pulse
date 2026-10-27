@@ -149,3 +149,9 @@ footer { max-width: 1080px; margin: 0 auto; padding: 0 20px 40px; font-size: 12p
 
 /* Grid children may shrink below their text width, so long names truncate instead of widening the page. */
 .movers > *, .cols > *, .work > *, .facts > * { min-width: 0; }
+
+/* OpenStreetMap on the Origins page */
+.osmcard { margin-top: 16px; overflow: hidden; }
+#osm { height: 380px; background: var(--fill2); z-index: 0; }
+.osmcard + .prose { padding-top: 8px; padding-bottom: 8px; }
+@media (max-width: 760px) { #osm { height: 300px; } }

@@ -133,8 +133,44 @@ function originsCard(limit) {
   return `<section class="card mapcard"><svg class="map" viewBox="0 0 ${W} ${H}" role="img" aria-label="Hop origins map"><g class="grid">${grid}</g>${dots}</svg><div>${legend}</div></section>`;
 }
 function origins() {
-  return `<p class="eyebrow">Hops by origin country</p><h1 class="lt">Origins</h1>${originsCard(D.origins.length)}
-    <p class="note">Weighted by recipe count across the ${D.origin_hops} most used hops. Where a hop lists several origins the first one counts. Circle size follows share.</p>`;
+  const legend = D.origins.map((g) => `<div class="leg"><span>${esc(g.flag)} ${esc(g.country)}<small>${g.hops.slice(0, 3).map(esc).join(', ')}</small></span><b>${g.share}%</b></div>`).join('');
+  return `<p class="eyebrow">Hops by origin country</p><h1 class="lt">Origins</h1>
+    <section class="card osmcard"><div id="osm" role="img" aria-label="Map of hop growing regions"></div></section>
+    <section class="card prose">${legend}</section>
+    <p class="note">Weighted by recipe count across the ${D.origin_hops} most used hops. Where a hop lists several origins the first one counts. Circle size follows share. Map data from OpenStreetMap.</p>`;
+}
+
+// Leaflet loads only when the Origins page opens, pinned to 1.9.4 with integrity hashes.
+const LEAFLET = 'https://unpkg.com/leaflet@1.9.4/dist/';
+let leafletReady = null;
+function loadLeaflet() {
+  leafletReady ??= new Promise((ok, fail) => {
+    const css = Object.assign(document.createElement('link'), { rel: 'stylesheet', href: `${LEAFLET}leaflet.css`, integrity: 'sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=', crossOrigin: '' });
+    const js = Object.assign(document.createElement('script'), { src: `${LEAFLET}leaflet.js`, integrity: 'sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=', crossOrigin: '', onload: ok, onerror: fail });
+    document.head.append(css, js);
+  });
+  return leafletReady;
+}
+function initMap() {
+  loadLeaflet().then(() => {
+    const el = $('#osm');
+    if (!el) return;
+    const map = L.map(el, { scrollWheelZoom: false, worldCopyJump: true }).setView([30, 20], 1);
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 8, attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+    }).addTo(map);
+    const pts = [];
+    for (const g of D.origins) {
+      const p = PLACES[g.country];
+      if (!p) continue;
+      const ll = [p[1], p[0]];
+      pts.push(ll);
+      L.circleMarker(ll, { radius: Math.max(6, Math.sqrt(g.share) * 4), color: '#248a3d', weight: 2, fillColor: '#34c759', fillOpacity: .35 })
+        .bindPopup(`<b>${esc(g.flag)} ${esc(g.country)}</b><br>${g.share}% of hop use<br><small>${g.hops.slice(0, 5).map(esc).join(', ')}</small>`)
+        .addTo(map);
+    }
+    if (pts.length) map.fitBounds(pts, { padding: [30, 30], maxZoom: 3 });
+  }).catch(() => { const el = $('#osm'); if (el) el.innerHTML = '<p class="note" style="padding:14px">The map could not load. The list below has every country.</p>'; });
 }
 
 function search(q = '') {
@@ -187,6 +223,7 @@ function render() {
   chrome(route === 'item' ? 'browse' : views[route] ? route : 'today');
   $('#view').innerHTML = view();
   window.scrollTo(0, 0);
+  if (route === 'origins') initMap();
   const q = $('#q');
   if (q) { q.focus(); q.addEventListener('input', () => { $('#results').innerHTML = results(q.value); }); }
 }
