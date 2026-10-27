@@ -1,0 +1,13 @@
+{
+  "name": "Brew Pulse",
+  "short_name": "Brew Pulse",
+  "description": "What brewers are brewing this month. Built on Beer Analytics by Christian Scheb.",
+  "start_url": "./#/today",
+  "display": "standalone",
+  "background_color": "#f2f2f7",
+  "theme_color": "#ff9500",
+  "icons": [
+    { "src": "apple-touch-icon.png", "sizes": "180x180", "type": "image/png" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}

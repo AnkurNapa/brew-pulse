@@ -30,7 +30,7 @@ a { color: var(--blue); text-decoration: none; }
 /* ---------- frame ---------- */
 #top { position: sticky; top: 0; z-index: 10; display: flex; align-items: center; gap: 4px; padding: 10px max(20px, calc(50% - 540px)); background: var(--bar); backdrop-filter: saturate(180%) blur(20px); -webkit-backdrop-filter: saturate(180%) blur(20px); border-bottom: 1px solid var(--line); }
 .brand { display: flex; align-items: center; gap: 10px; margin-right: auto; color: var(--ink); font-weight: 700; font-size: 17px; letter-spacing: -.02em; }
-.brand .mark { width: 30px; height: 30px; border-radius: 8px; display: grid; place-items: center; background: var(--orange); color: #fff; }
+.brand .mark { width: 30px; height: 30px; border-radius: 7px; display: block; }
 .brand .mark .ico { width: 18px; height: 18px; stroke-width: 2; }
 #top nav a { display: flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 8px; color: var(--text); font-size: 14px; font-weight: 500; }
 #top nav a:hover { background: var(--fill2); }

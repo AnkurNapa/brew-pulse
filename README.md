@@ -1,8 +1,8 @@
-# Brew Trends
+# Brew Pulse
 
 What brewers are brewing this month, on your phone. Rising and falling styles, hops and yeasts, every ingredient ranked by recipe count, a map of where the most used hops grow plus search.
 
-**Live site:** https://ankurnapa.github.io/brew-trends/
+**Live site:** https://ankurnapa.github.io/brew-pulse/
 
 ## Built on Beer Analytics
 
